@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TAMANHOMAXIMO 100
+
+typedef struct _RegPilha {
+    char dado[TAMANHOMAXIMO];
+    struct _RegPilha *prox;
+} RegPilha;
+
+typedef RegPilha * Pilha;
+
+RegPilha* AlocaRegPilha() {
+    RegPilha *p = (RegPilha*) calloc(1, sizeof(RegPilha));
+    if (p == NULL) {
+        exit(-1);
+    }
+    strcpy(p->dado, "Início da Pilha");
+    return p;
+}
+
+Pilha CriaPilha() {
+    Pilha p = AlocaRegPilha();
+    p->prox = NULL;
+    return p;
+}
+
+void AdicionaNaPilha(Pilha p, char entrada[]) {
+    RegPilha *q = AlocaRegPilha();
+    strcpy(q->dado, entrada);
+    q->prox = p->prox;
+    p->prox = q;
+}
+
+const char* RemoverDaPilha(Pilha p) {
+    RegPilha *q = p->prox;
+    p->prox = q->prox;
+    char *saida = q->dado;
+    free(q);
+    return saida;
+}
+
+void PrintaPilha(Pilha p) {
+    printf("%s\n", p->dado);
+    if (p->prox == NULL) {
+        return;
+    }
+    PrintaPilha(p->prox);
+}
+
+int main() {
+    Pilha pilha = CriaPilha();
+    AdicionaNaPilha(pilha, "oi");
+    AdicionaNaPilha(pilha, "como");
+    AdicionaNaPilha(pilha, "vai");
+    PrintaPilha(pilha);
+    printf("\n");
+    printf("%s\n", RemoverDaPilha(pilha));
+    printf("\n");
+    PrintaPilha(pilha);
+    return 0;
+}
