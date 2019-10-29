@@ -45,6 +45,15 @@ void AdicionaNaPilha(Pilha p, char entrada[]) {
     p->prox = q;
 }
 
+char* UltimoDaPilha(Pilha p) {
+    RegPilha *q = p->prox;
+    
+    static char saida[TAMANHOMAXIMO];
+    strcpy(saida, q->dado);
+
+    return saida;
+}
+
 char* RemoverDaPilha(Pilha p) {
     RegPilha *q = p->prox;
     p->prox = q->prox;
@@ -79,9 +88,14 @@ int TipoDeTag(char caractere) {
     }
 }
 
+void GerenciamentoDePilha(Pilha p, char entrada[], int tipodetag, int linha){
+
+} 
+
 void XMLParaPilha(Pilha p, char arquivo[]) {
     FILE *fp;
     long int sizeoffile;
+    int linha = 1;
 
     int abrechaves = FALSE;
     int natag = FALSE;
@@ -98,22 +112,23 @@ void XMLParaPilha(Pilha p, char arquivo[]) {
     sizeoffile = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
-    char teste[TAMANHOMAXIMO];
+    char tag[TAMANHOMAXIMO];
     int posicao = 0;
     for(int i=0; i<sizeoffile; i++) {
         char caractere;
         fscanf(fp, "%c", &caractere);
 
+        if (caractere == '\n') {
+            linha++;
+        }
+
         if (caractere == '<' && abrechaves == FALSE) {
             abrechaves = TRUE;
-            //printf("abriu chaves\n");
             continue;
         }
         
         if (abrechaves == TRUE) {
-            //printf("calculou tipo de tag\n");
             tipodetag = TipoDeTag(caractere);
-            //printf("Tipo de tag\n", tipodetag);
             abrechaves = FALSE;
 
             if (tipodetag == TAGFECHAMENTO) {
@@ -131,13 +146,12 @@ void XMLParaPilha(Pilha p, char arquivo[]) {
                 tipodeleitura = PARAMETRO;
             } else if (caractere == '>') {
                 natag = FALSE;
-                teste[posicao] = '\0';
-                printf("%s %d\n", teste, tipodetag);
-                //AdicionaNaPilha(p, teste);
-                teste[0] = '\0';
+                tag[posicao] = '\0';
+                AdicionaNaPilha(p, tag);
+                tag[0] = '\0';
                 posicao = 0;
             } else {
-                teste[posicao] = caractere;
+                tag[posicao] = caractere;
                 posicao++;
             }
             continue;
@@ -146,34 +160,25 @@ void XMLParaPilha(Pilha p, char arquivo[]) {
         if (natag == TRUE && tipodeleitura == PARAMETRO) {
             if (caractere == '>') {
                 natag = FALSE;
-                teste[posicao] = '\0';
-                printf("%s %d\n", teste, tipodetag);
-                //AdicionaNaPilha(p, teste);
-                teste[0] = '\0';
+                tag[posicao] = '\0';
+                AdicionaNaPilha(p, tag);
+                tag[0] = '\0';
                 posicao = 0;
             }
         }
-
-
-
-
-
-
-
-
-
 
     }
 
 }
 
 int main() {
-    Pilha pilha;
+    Pilha pilha = CriaPilha();
     char arquivo[TAMANHOMAXIMO];
 
     scanf("%s", arquivo);
+
     XMLParaPilha(pilha, arquivo);
-    //PrintaPilha(pilha);
+    PrintaPilha(pilha);
 
     return 0;
 }
