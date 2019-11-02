@@ -91,7 +91,8 @@ void GerenciamentoDePilha(Pilha p, char entrada[], int tipodetag, int linhadoarq
     if (tipodetag == TAGABERTURA) {
         if (p->prox == NULL && (strcmp(entrada, tagxml) != 0)) {
             printf(" Violacao da regra #3:\n");
-            printf("Raiz adicional ('%s' na linha %d)", entrada, linhadoarquivo);
+            printf("Raiz adicional ('%s' na linha %d)\n", entrada, linhadoarquivo);
+            LiberaPilha(p);
             exit(-1);
         }
         AdicionaNaPilha(p, entrada, linhadoarquivo);
@@ -100,10 +101,12 @@ void GerenciamentoDePilha(Pilha p, char entrada[], int tipodetag, int linhadoarq
             if (strcasecmp(entrada, UltimoDaPilha(p)->dado) == 0) {
                 printf("Violacao da regra #1:\n");
                 printf("Tags incompativeis (abertura '%s' na linha %d e fechamento '%s' na linha %d)\n", UltimoDaPilha(p)->dado, UltimoDaPilha(p)->linha, entrada, linhadoarquivo);
+                LiberaPilha(p);
                 exit(-1);
             } else {
                 printf("Violacao da regra #2:\n");
                 printf("Tags incompativeis (abertura '%s' na linha %d e fechamento '%s' na linha %d)\n", UltimoDaPilha(p)->dado, UltimoDaPilha(p)->linha, entrada, linhadoarquivo);
+                LiberaPilha(p);
                 exit(-1);
             }
         } else {
@@ -203,6 +206,8 @@ int main() {
     XMLParaPilha(pilha, arquivo);
 
     printf("Tags balanceadas\n");
+
+    LiberaPilha(pilha);
 
     return 0;
 }
